@@ -3,11 +3,11 @@
 World::World( const char* path_ground, const char* path_ores) {
     //this->engine = engine;
 
-    // Carregando textura do terreno e dos minérios
+   //Carregando textura do terreno e dos minérios
     /*texture_ground = new Texture(engine, path_ground);
     texture_ground->setPos(0, WORLD_MARGIN_TOP);
-    texture_ores = new Texture(engine, path_ores);*/
-    /*texture_ores->setWidth(32);
+    texture_ores = new Texture(engine, path_ores);
+    texture_ores->setWidth(32);
     texture_ores->setHeight(32);*/
 
     // Marcando as paredes como ocupado
@@ -21,23 +21,17 @@ World::World( const char* path_ground, const char* path_ores) {
         occupied[0][y] = true;
         occupied[WORLD_WIDTH - 1][y] = true;
     }
-
-    // Inicializando mutex
-    pthread_mutex_init(&mutex, NULL);
 }
 
-//World::~World() {
-//    delete texture_ground;
-//    delete texture_ores;
-//
-//     Destruindo mutex
-//    pthread_mutex_destroy(&mutex);
-//}
-//
-//void World::render() {
-//    texture_ground->render();
-//    texture_ores->render();
-//}
+World::~World() {
+    delete texture_ground;
+    delete texture_ores;
+}
+
+void World::render() {
+    texture_ground->render();
+    texture_ores->render();
+}
 
 bool World::isOccupied(int x, int y) {
     return occupied[x][y];

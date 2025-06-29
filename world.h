@@ -5,8 +5,10 @@
 #include <SFML/System.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Window.hpp>
-#include <pthread.h>
+#include <iostream>
+#include <mutex>
 
+// Definir isso ainda??
 #define WORLD_MARGIN_TOP 88
 #define WORLD_WIDTH 25
 #define WORLD_HEIGHT 15
@@ -25,13 +27,12 @@ private:
 
 public:
     // Mutex de acesso à variável occupied
-    pthread_mutex_t mutex;
+    std::mutex mutex;
 
     World(const char* path_ground, const char* path_ores);
     ~World();
 
     void render();
-    void update();
     bool isOccupied(int x, int y);
     void setOccupied(int x, int y, bool value);
 
