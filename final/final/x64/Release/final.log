@@ -1,0 +1,14 @@
+﻿  final.cpp
+C:\SFML-3.0.0\include\SFML\System\Exception.hpp(41,47): warning C4275: não dll-interface class 'std::runtime_error' usado como base para dll-interface class 'sf::Exception'
+  (compilando o arquivo fonte 'final.cpp')
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\include\stdexcept(100,30):
+      consulte a declaração de 'std::runtime_error'
+      C:\SFML-3.0.0\include\SFML\System\Exception.hpp(41,23):
+      consulte a declaração de 'sf::Exception'
+  
+  Gerando código
+  1 of 486 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finalizada a geração de código
+  final.vcxproj -> C:\Users\Dell\Desktop\so-final\final\x64\Release\final.exe
