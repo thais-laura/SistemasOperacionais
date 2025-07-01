@@ -13,10 +13,9 @@ void Game::initPersonagens() {
 
     const float THREAD_NAME_SCALE = 0.25f;
 
-    Personagem* thread1 = new Personagem(dirPersonagem1Texture, sf::Vector2f(CELL_SIZE * 18, CELL_SIZE * 7), 2.0f, dirThreadNamesTexture, THREAD_NAME_SCALE, 0);
-    Personagem* thread2 = new Personagem(dirPersonagem2Texture, sf::Vector2f(CELL_SIZE * 12, CELL_SIZE * 5), 2.0f, dirThreadNamesTexture, THREAD_NAME_SCALE, 1);
-    Personagem* thread3 = new Personagem(dirPersonagem3Texture, sf::Vector2f(CELL_SIZE * 15, CELL_SIZE * 9), 2.0f, dirThreadNamesTexture, THREAD_NAME_SCALE, 2);
-
+    Personagem* thread1 = new Personagem(dirPersonagem1Texture, sf::Vector2f(CELL_SIZE * 1, CELL_SIZE * 9), 2.0f, dirThreadNamesTexture, THREAD_NAME_SCALE, 0);
+    Personagem* thread2 = new Personagem(dirPersonagem2Texture, sf::Vector2f(CELL_SIZE * 12, CELL_SIZE * 17), 2.0f, dirThreadNamesTexture, THREAD_NAME_SCALE, 1);
+    Personagem* thread3 = new Personagem(dirPersonagem3Texture, sf::Vector2f(CELL_SIZE * 15, CELL_SIZE * 17), 2.0f, dirThreadNamesTexture, THREAD_NAME_SCALE, 2);
     
     this->personagens.push_back(std::move(thread1));
     this->personagens.push_back(std::move(thread2));
@@ -108,7 +107,7 @@ void Game::update()
         this->updateRandomEnemies();
 
         for (auto it = this->personagens.begin(); it != this->personagens.end(); it++) {
-            (*it)->update();
+            (*it)->update(this->world, this->bau);
         }
         
         this->bau->update();

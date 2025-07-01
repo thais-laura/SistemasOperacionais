@@ -8,7 +8,7 @@
 
 // Definir isso ainda??
 #define WORLD_MARGIN_TOP 88
-#define WORLD_WIDTH 20
+#define WORLD_WIDTH 21
 #define WORLD_HEIGHT 22
 #define CELL_SIZE 32.f
 
@@ -46,7 +46,7 @@ public:
     void spawnTreasure();
     int catchTreasure(int x, int y);
 
-    Vector2f randomPoint();
+    Vector2i randomPoint();
     Vector2i getTreasurePosition();
 
 };

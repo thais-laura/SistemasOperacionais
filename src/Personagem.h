@@ -8,6 +8,7 @@
 #include <string>
 #include <iostream>
 #include "world.h"
+#include "Bau.h"
 
 #define THREAD_NAME_WIDTH 288
 #define THREAD_NAME_HEIGHT 95
@@ -31,7 +32,7 @@ private:
     int m_currentFrame;
     int id;
     int score;
-    float gameSpeed;
+    int gameSpeed;
     float m_animationSpeed;
     float m_moveSpeed_x;
     float m_moveSpeed_y;
@@ -62,7 +63,7 @@ public:
         :m_estado(Estado::Parado),
         m_currentFrame(0),
         m_frameCounter(0),
-        gameSpeed(3.0),
+        gameSpeed(3),
         id(id),
         score(0)
     {
@@ -124,29 +125,29 @@ public:
 
         switch (direction) {
         case 0:
-            this->m_moveSpeed_x = -4.0f / gameSpeed;
-            this->m_moveSpeed_y = 0.0f / gameSpeed;
+            this->m_moveSpeed_x = -1.0f;
+            this->m_moveSpeed_y = 0.0f;
             world->setOccupied(map_x, map_y, false);
             map_x--;
             world->setOccupied(map_x, map_y, true);
             break;
         case 1:
-            this->m_moveSpeed_x = 4.0f / gameSpeed;
-            this->m_moveSpeed_y = 0.0f / gameSpeed;
+            this->m_moveSpeed_x = 1.0f;
+            this->m_moveSpeed_y = 0.0f;
             world->setOccupied(map_x, map_y, false);
             map_x++;
             world->setOccupied(map_x, map_y, true);
             break;
         case 2:
-            this->m_moveSpeed_x = 0.0f / gameSpeed;
-            this->m_moveSpeed_y = -4.0f / gameSpeed;
+            this->m_moveSpeed_x = 0.0f;
+            this->m_moveSpeed_y = -1.0f;
             world->setOccupied(map_x, map_y, false);
             map_y--;
             world->setOccupied(map_x, map_y, true);
             break;
         case 3:
-            this->m_moveSpeed_x = 0.0f / gameSpeed;
-            this->m_moveSpeed_y = 4.0f / gameSpeed;
+            this->m_moveSpeed_x = 0.0f;
+            this->m_moveSpeed_y = 1.0f;
             world->setOccupied(map_x, map_y, false);
             map_y++;
             world->setOccupied(map_x, map_y, true);
@@ -157,31 +158,37 @@ public:
     void randomMovement(World* world) {
         if (m_estado == Estado::Animando) return;
 
+        if (m_frameCounter > 0) {
+            m_frameCounter--;
+            return;
+        }
+
         int treasure_x = world->getTreasurePosition().x;
         int treasure_y = world->getTreasurePosition().y;
 
         int p = (rand() % 100) + 1;
 
-        if (p > 31) {
+        if (p > 69) {
             for (int i = 0; i < 10; i++) {
                 int direction = (rand() % 7);
                 if (direction == 0 && !world->isOccupied(map_x - 1, map_y)) {
                     mapMove(world, direction);
                     break;
                 }
-                if (direction == 1 && !world->isOccupied(map_x + 1, map_y)) {
+                else if (direction == 1 && !world->isOccupied(map_x + 1, map_y)) {
                     mapMove(world, direction);
                     break;
                 }
-                if (direction == 2 && !world->isOccupied(map_x, map_y - 1)) {
+                else if (direction == 2 && !world->isOccupied(map_x, map_y - 1)) {
                     mapMove(world, direction);
                     break;
                 }
-                if (direction == 3 && !world->isOccupied(map_x, map_y + 1)) {
+                else if (direction == 3 && !world->isOccupied(map_x, map_y + 1)) {
                     mapMove(world, direction);
                     break;
                 }
-                if (direction > 3) {
+                else if (direction > 3) {
+                    m_frameCounter = 32;
                     break;
                 }
             }
@@ -190,13 +197,13 @@ public:
             if (treasure_x < map_x && !world->isOccupied(map_x - 1, map_y)) {
                 mapMove(world, 0);
             }
-            if (treasure_x > map_x && !world->isOccupied(map_x + 1, map_y)) {
+            else if (treasure_x > map_x && !world->isOccupied(map_x + 1, map_y)) {
                 mapMove(world, 1);
             }
-            if (treasure_y < map_y && !world->isOccupied(map_x, map_y - 1)) {
+            else if (treasure_y < map_y && !world->isOccupied(map_x, map_y - 1)) {
                 mapMove(world, 2);
             }
-            if (treasure_y > map_y && !world->isOccupied(map_x, map_y + 1)) {
+            else if (treasure_y > map_y && !world->isOccupied(map_x, map_y + 1)) {
                 mapMove(world, 3);
             }
         }
@@ -218,18 +225,29 @@ public:
         else if (keyPressed.scancode == sf::Keyboard::Scancode::Down && !world->isOccupied(map_x, map_y + 1) ) {
             mapMove(world, 3);
         }
-        std::cout << world->getTreasurePosition().x << " " << world->getTreasurePosition().y << "\n";
     }
 
-    void update() {
+    void checkGotTreasure(World* world, Bau* bau) {
+        if (this->getPosMap() == world->getTreasurePosition()) {
+            this->score += bau->getScore();
+            world->spawnTreasure();
+            bau->setNextPosition({ world->getTreasurePosition().x * CELL_SIZE, world->getTreasurePosition().y * CELL_SIZE });
+        }
+    }
+
+    void update(World* world, Bau* bau) {
         if (m_estado == Estado::Animando) {
             m_frameCounter++;
             if (m_frameCounter == gameSpeed) {
                 m_frameCounter = 0;
                 m_currentFrame++;
+                m_sprite->setPosition({ m_sprite->getPosition().x + m_moveSpeed_x,m_sprite->getPosition().y + m_moveSpeed_y });
             }
+
                 if (m_currentFrame >= m_animationFrames.size()) {
+                    m_sprite->setPosition({ m_sprite->getPosition().x + m_moveSpeed_x,m_sprite->getPosition().y + m_moveSpeed_y });
                     m_currentFrame = 0;
+                    m_frameCounter = 0;
                     m_estado = Estado::Parado;
                     m_moveSpeed_x = 0;
                     m_moveSpeed_y = 0;
@@ -237,9 +255,10 @@ public:
                 m_sprite->setTextureRect(m_animationFrames[m_currentFrame]);
 
                 m_sprite->setPosition({ m_sprite->getPosition().x + m_moveSpeed_x,m_sprite->getPosition().y + m_moveSpeed_y });
-             
         }
         updateNameSpritePosition(m_sprite->getScale().x);
+
+        checkGotTreasure(world, bau);
     }
 
     void render(sf::RenderTarget* target) {
@@ -253,6 +272,10 @@ public:
 
     Estado getEstado()  {
         return m_estado;
+    }
+
+    int getScore() {
+        return score;
     }
 
     sf::Vector2i getPosMap() {

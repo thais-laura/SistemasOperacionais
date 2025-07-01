@@ -17,11 +17,16 @@ private:
     sf::Texture m_texture;
     Estado m_estado;
     int m_currentFrame;
+    int m_frameCounter;
+    int revolutions;
+    int m_currentItem;
 
     std::vector<sf::IntRect> m_frames;
 
     sf::Vector2f m_itemSpawnOffset1;
     sf::Vector2f m_itemSpawnOffset2;
+    sf::Vector2f m_bauNextPosition;
+    sf::Vector2f m_bauOffset;
 
     std::vector<Item*> m_itens;
 
@@ -53,13 +58,19 @@ private:
 public:
     Bau(sf::Vector2f position, float scale)
         :m_estado(Estado::Fechado),
-        m_currentFrame(0)
+        m_bauNextPosition(position),
+        m_currentFrame(0),
+        m_frameCounter(0),
+        revolutions(6),
+        m_currentItem(0)
     {
         initSprite();
         initItens();
 
+        m_bauOffset = {8.f, 24.f };
+
         m_sprite->setScale(sf::Vector2f(scale, scale));
-        m_sprite->setPosition(position);
+        m_sprite->setPosition(position+m_bauOffset);
 
         m_frames.push_back(sf::IntRect(sf::Vector2i(0, 0), sf::Vector2i(48, 36)));
         m_frames.push_back(sf::IntRect(sf::Vector2i(48, 0), sf::Vector2i(48, 36)));
@@ -110,6 +121,16 @@ public:
         m_estado = estado;
     }
 
+    int getScore() {
+        this->m_currentItem = rand() % 2;
+        this->abrir();
+        return this->m_itens[m_currentItem]->getValue();
+    }
+
+    void setNextPosition(sf::Vector2f position) {
+        this->m_bauNextPosition = position;
+    }
+
     void updateItemPositions() {
         for (auto it : this->m_itens) {
             it->setPosition(m_sprite->getPosition() + it->getOriginalOffset());
@@ -119,38 +140,48 @@ public:
     void update() {
 
         updateItemPositions();
+
+
             if (m_estado == Estado::Abrindo) {
-                m_currentFrame++;
+                m_frameCounter++;
+                if (m_frameCounter == revolutions) {
+                    m_currentFrame++;
+                    m_frameCounter = 0;
+                }
+                
 
                 if (m_currentFrame >= m_frames.size()) {
                     m_currentFrame = static_cast<int>(m_frames.size() - 1);
+                    m_frameCounter = 0;
                     m_estado = Estado::Aberto;
                 }
                 
-                m_sprite->setTextureRect(m_frames[m_currentFrame]);
             }
             else if (m_estado == Estado::Fechando) {
-                m_currentFrame--;
+                m_frameCounter++;
+                if (m_frameCounter == revolutions) {
+                    m_currentFrame--;
+                    m_frameCounter = 0;
+                }
 
                 if (m_currentFrame < 0) {
-                    m_currentFrame = 10;
+                    m_currentFrame = 0;
+                    m_frameCounter = 0;
                     m_estado = Estado::Fechado;
 
                 }
-                
-                m_sprite->setTextureRect(m_frames[m_currentFrame]);
             }
             else if (m_estado == Estado::Aberto) {
-                for (auto item : m_itens) {
-                    item->setVisible(true);
-                }
+                this->m_itens[m_currentItem]->setVisible(true);
                 fechar();
             }
             else if (m_estado == Estado::Fechado) {
+                m_sprite->setPosition(m_bauNextPosition+m_bauOffset);
                 for (auto item : m_itens) {
                     item->setVisible(false);
                 }
             }
+            m_sprite->setTextureRect(m_frames[m_currentFrame]);
     }
 
     void render(sf::RenderTarget* target) const {
