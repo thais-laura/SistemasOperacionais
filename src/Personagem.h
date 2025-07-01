@@ -1,12 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-#include <optional>
-#include <vector>
-#include <map>
-#include <chrono>
-#include <memory>
 #include <string>
-#include <iostream>
 #include "world.h"
 #include "Bau.h"
 
@@ -47,52 +41,11 @@ private:
     const int THREAD_NAME_SPRITE_WIDTH = 288;
     const int THREAD_NAME_SPRITE_HEIGHT = 95;
 
-    void initSprites(std::string textureDir, std::string nameTextureDir) {
-        m_texture.loadFromFile(textureDir);
-        m_nameTexture.loadFromFile(nameTextureDir);
-
-        m_threadNameRect = sf::IntRect(sf::Vector2i(0, id * THREAD_NAME_HEIGHT), sf::Vector2i(THREAD_NAME_WIDTH, THREAD_NAME_HEIGHT));
-
-        m_sprite = new sf::Sprite(m_texture);
-        m_nomeSprite = new sf::Sprite(m_nameTexture);
-    }
+    void initSprites(std::string textureDir, std::string nameTextureDir);
 
 public:
     Personagem(std::string textureDir, sf::Vector2f position, float characterScale,
-        std::string nameTextureDir, float nameScale = 1.0f, int id = 0)
-        :m_estado(Estado::Parado),
-        m_currentFrame(0),
-        m_frameCounter(0),
-        gameSpeed(3),
-        id(id),
-        score(0)
-    {
-
-        this->initSprites(textureDir, nameTextureDir);
-
-        m_sprite->setScale(sf::Vector2f(characterScale, characterScale));
-        m_sprite->setPosition(position);
-
-        const int START_Y_FOR_THIRD_ROW = 2 * FRAME_HEIGHT;
-
-        for (int i = 0; i < 8; ++i) {
-            m_animationFrames.push_back(sf::IntRect(sf::Vector2i(i * FRAME_WIDTH, START_Y_FOR_THIRD_ROW),
-                sf::Vector2i(FRAME_WIDTH, FRAME_HEIGHT)));
-        }
-
-        m_sprite->setTextureRect(m_animationFrames[0]);
-
-        m_nomeSprite->setTextureRect(m_threadNameRect);
-
-        m_nomeSprite->setScale(sf::Vector2f(nameScale, nameScale));
-
-        m_nomeSprite->setOrigin(sf::Vector2f(THREAD_NAME_SPRITE_WIDTH / 2.0f, THREAD_NAME_SPRITE_HEIGHT / 2.0f));
-
-        updateNameSpritePosition(characterScale);
-
-        map_x = (int)position.x / 32.f;
-        map_y = (int)position.y / 32.f;
-    }
+        std::string nameTextureDir, float nameScale = 1.0f, int id = 0);
 
     Personagem(const Personagem&) = delete;
     Personagem& operator=(const Personagem&) = delete;
@@ -100,185 +53,29 @@ public:
     Personagem& operator=(Personagem&&) = default;
 
 
-    void iniciarAnimacao() {
-        if (m_estado == Estado::Parado) {
-            m_estado = Estado::Animando;
-            m_currentFrame = 0;
-            m_frameCounter = 0;
-        }
-    }
+void iniciarAnimacao();
+    
 
-    void updateNameSpritePosition(float characterScale) {
-        float scaledCharacterWidth = FRAME_WIDTH * characterScale;
-        float scaledCharacterHeight = FRAME_HEIGHT * characterScale;
+void updateNameSpritePosition(float characterScale);
 
+void mapMove(World* world, int direction);
 
-        float nameSpriteX = m_sprite->getPosition().x + scaledCharacterWidth / 2.0f;
+void randomMovement(World* world);
+    
 
-        float nameSpriteY = m_sprite->getPosition().y - scaledCharacterHeight + 40.0f;
+void handleKeyPress(sf::Event::KeyPressed keyPressed, World* world);
 
-        m_nomeSprite->setPosition(sf::Vector2f(nameSpriteX, nameSpriteY));
-    }
+void checkGotTreasure(World* world, Bau* bau);
 
-    void mapMove(World* world, int direction) {
-        this->m_estado = Estado::Animando;
+void update(World* world, Bau* bau);
 
-        switch (direction) {
-        case 0:
-            this->m_moveSpeed_x = -1.0f;
-            this->m_moveSpeed_y = 0.0f;
-            world->setOccupied(map_x, map_y, false);
-            map_x--;
-            world->setOccupied(map_x, map_y, true);
-            break;
-        case 1:
-            this->m_moveSpeed_x = 1.0f;
-            this->m_moveSpeed_y = 0.0f;
-            world->setOccupied(map_x, map_y, false);
-            map_x++;
-            world->setOccupied(map_x, map_y, true);
-            break;
-        case 2:
-            this->m_moveSpeed_x = 0.0f;
-            this->m_moveSpeed_y = -1.0f;
-            world->setOccupied(map_x, map_y, false);
-            map_y--;
-            world->setOccupied(map_x, map_y, true);
-            break;
-        case 3:
-            this->m_moveSpeed_x = 0.0f;
-            this->m_moveSpeed_y = 1.0f;
-            world->setOccupied(map_x, map_y, false);
-            map_y++;
-            world->setOccupied(map_x, map_y, true);
-            break;
-        }
-    }
+void render(sf::RenderTarget* target);
 
-    void randomMovement(World* world) {
-        if (m_estado == Estado::Animando) return;
+sf::FloatRect getGlobalBounds();
 
-        if (m_frameCounter > 0) {
-            m_frameCounter--;
-            return;
-        }
+Estado getEstado();
 
-        int treasure_x = world->getTreasurePosition().x;
-        int treasure_y = world->getTreasurePosition().y;
+int getScore();
 
-        int p = (rand() % 100) + 1;
-
-        if (p > 69) {
-            for (int i = 0; i < 10; i++) {
-                int direction = (rand() % 7);
-                if (direction == 0 && !world->isOccupied(map_x - 1, map_y)) {
-                    mapMove(world, direction);
-                    break;
-                }
-                else if (direction == 1 && !world->isOccupied(map_x + 1, map_y)) {
-                    mapMove(world, direction);
-                    break;
-                }
-                else if (direction == 2 && !world->isOccupied(map_x, map_y - 1)) {
-                    mapMove(world, direction);
-                    break;
-                }
-                else if (direction == 3 && !world->isOccupied(map_x, map_y + 1)) {
-                    mapMove(world, direction);
-                    break;
-                }
-                else if (direction > 3) {
-                    m_frameCounter = 32;
-                    break;
-                }
-            }
-        }
-        else {
-            if (treasure_x < map_x && !world->isOccupied(map_x - 1, map_y)) {
-                mapMove(world, 0);
-            }
-            else if (treasure_x > map_x && !world->isOccupied(map_x + 1, map_y)) {
-                mapMove(world, 1);
-            }
-            else if (treasure_y < map_y && !world->isOccupied(map_x, map_y - 1)) {
-                mapMove(world, 2);
-            }
-            else if (treasure_y > map_y && !world->isOccupied(map_x, map_y + 1)) {
-                mapMove(world, 3);
-            }
-        }
-    }
-
-    void handleKeyPress(sf::Event::KeyPressed keyPressed, World* world) {
-
-        if (m_estado == Estado::Animando) return;
-
-        if (keyPressed.scancode == sf::Keyboard::Scancode::Left && !world->isOccupied(map_x-1,map_y)) {
-            mapMove(world, 0);
-        }
-        else if (keyPressed.scancode == sf::Keyboard::Scancode::Right && !world->isOccupied(map_x + 1, map_y) ) {
-            mapMove(world, 1);
-        }
-        else if (keyPressed.scancode == sf::Keyboard::Scancode::Up && !world->isOccupied(map_x, map_y - 1) ) {
-            mapMove(world, 2);
-        }
-        else if (keyPressed.scancode == sf::Keyboard::Scancode::Down && !world->isOccupied(map_x, map_y + 1) ) {
-            mapMove(world, 3);
-        }
-    }
-
-    void checkGotTreasure(World* world, Bau* bau) {
-        if (this->getPosMap() == world->getTreasurePosition()) {
-            this->score += bau->getScore();
-            world->spawnTreasure();
-            bau->setNextPosition({ world->getTreasurePosition().x * CELL_SIZE, world->getTreasurePosition().y * CELL_SIZE });
-        }
-    }
-
-    void update(World* world, Bau* bau) {
-        if (m_estado == Estado::Animando) {
-            m_frameCounter++;
-            if (m_frameCounter == gameSpeed) {
-                m_frameCounter = 0;
-                m_currentFrame++;
-                m_sprite->setPosition({ m_sprite->getPosition().x + m_moveSpeed_x,m_sprite->getPosition().y + m_moveSpeed_y });
-            }
-
-                if (m_currentFrame >= m_animationFrames.size()) {
-                    m_sprite->setPosition({ m_sprite->getPosition().x + m_moveSpeed_x,m_sprite->getPosition().y + m_moveSpeed_y });
-                    m_currentFrame = 0;
-                    m_frameCounter = 0;
-                    m_estado = Estado::Parado;
-                    m_moveSpeed_x = 0;
-                    m_moveSpeed_y = 0;
-                }
-                m_sprite->setTextureRect(m_animationFrames[m_currentFrame]);
-
-                m_sprite->setPosition({ m_sprite->getPosition().x + m_moveSpeed_x,m_sprite->getPosition().y + m_moveSpeed_y });
-        }
-        updateNameSpritePosition(m_sprite->getScale().x);
-
-        checkGotTreasure(world, bau);
-    }
-
-    void render(sf::RenderTarget* target) {
-        target->draw(*m_sprite);
-        target->draw(*m_nomeSprite);
-    }
-
-    sf::FloatRect getGlobalBounds()  {
-        return m_sprite->getGlobalBounds();
-    }
-
-    Estado getEstado()  {
-        return m_estado;
-    }
-
-    int getScore() {
-        return score;
-    }
-
-    sf::Vector2i getPosMap() {
-        return sf::Vector2i({ this->map_x,this->map_y });
-    }
+sf::Vector2i getPosMap();
 };

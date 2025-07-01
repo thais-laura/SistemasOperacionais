@@ -17,47 +17,21 @@ private:
     int Value;
 
 public:
-    Item(std::string textureDir, sf::Vector2f position, float scale = 1.0f, sf::Vector2f originalOffset = { 0.f, 0.f }, int Value=100)
-        :
-        m_isVisible(false),
-        m_originalOffset(originalOffset),
-        Value(Value)
-    {
+    Item(std::string textureDir, sf::Vector2f position, float scale = 1.0f, sf::Vector2f originalOffset = { 0.f, 0.f }, int Value = 100);
 
-        m_texture.loadFromFile(textureDir);
-        m_sprite = new sf::Sprite(m_texture);
+    ~Item();
 
-        m_sprite->setPosition(position);
-        m_sprite->setScale(sf::Vector2f(scale, scale));
-    }
+    void setVisible(bool visible);
 
-    void setVisible(bool visible) {
-        m_isVisible = visible;
-    }
+    bool isVisible();
 
-    bool isVisible() const {
-        return m_isVisible;
-    }
+    void render(sf::RenderTarget* target);
 
-    void render(sf::RenderTarget* target) const {
-        if (m_isVisible) {
-            target->draw(*m_sprite);
-        }
-    }
+    void setValue(int value);
 
-    void setValue(int value) {
-        this->Value = value;
-    }
+    int getValue();
 
-    int getValue() {
-        return this->Value;
-    }
+    void setPosition(sf::Vector2f position);
 
-    void setPosition(sf::Vector2f position) {
-        m_sprite->setPosition(position);
-    }
-
-    sf::Vector2f getOriginalOffset() const {
-        return m_originalOffset;
-    }
+    sf::Vector2f getOriginalOffset();
 };
