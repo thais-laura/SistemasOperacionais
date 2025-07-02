@@ -10,6 +10,7 @@ void Personagem::initSprites(std::string textureDir, std::string nameTextureDir)
     m_nomeSprite = new sf::Sprite(m_nameTexture);
 }
 
+// Construtor
 Personagem::Personagem(std::string textureDir, sf::Vector2f position, float characterScale,
         std::string nameTextureDir, float nameScale, int id)
         :m_estado(Estado::Parado),
@@ -27,6 +28,7 @@ Personagem::Personagem(std::string textureDir, sf::Vector2f position, float char
 
         const int START_Y_FOR_THIRD_ROW = 2 * FRAME_HEIGHT;
 
+        // Popula o mapa com os jogadores
         for (int i = 0; i < 8; ++i) {
             m_animationFrames.push_back(sf::IntRect(sf::Vector2i(i * FRAME_WIDTH, START_Y_FOR_THIRD_ROW),
                 sf::Vector2i(FRAME_WIDTH, FRAME_HEIGHT)));
@@ -54,7 +56,7 @@ Personagem::Personagem(std::string textureDir, sf::Vector2f position, float char
             m_frameCounter = 0;
         }
     }
-
+	// Centraliza o nome acima do personagem
     void Personagem::updateNameSpritePosition(float characterScale) {
         float scaledCharacterWidth = FRAME_WIDTH * characterScale;
         float scaledCharacterHeight = FRAME_HEIGHT * characterScale;
@@ -67,6 +69,7 @@ Personagem::Personagem(std::string textureDir, sf::Vector2f position, float char
         m_nomeSprite->setPosition(sf::Vector2f(nameSpriteX, nameSpriteY));
     }
 
+	// Sempre atualiza as coordenadas do mapa para ocupado/desocupado
     void Personagem::mapMove(World* world, int direction) {
         this->m_estado = Estado::Animando;
 
@@ -101,7 +104,7 @@ Personagem::Personagem(std::string textureDir, sf::Vector2f position, float char
             break;
         }
     }
-
+	// Movimento autônomo dos "inimigos" guiado pela posição do tesouro
     void Personagem::randomMovement(World* world) {
         if (m_estado == Estado::Animando) return;
 
@@ -156,8 +159,8 @@ Personagem::Personagem(std::string textureDir, sf::Vector2f position, float char
         }
     }
 
+    // Movimentação pelo teclado
     void Personagem::handleKeyPress(sf::Event::KeyPressed keyPressed, World* world) {
-
         if (m_estado == Estado::Animando) return;
 
         if (keyPressed.scancode == sf::Keyboard::Scancode::Left && !world->isOccupied(map_x - 1, map_y)) {
@@ -174,6 +177,7 @@ Personagem::Personagem(std::string textureDir, sf::Vector2f position, float char
         }
     }
 
+	// Adiciona o prêmio à pontuação se conseguir pegar o tesouro
     void Personagem::checkGotTreasure(World* world, Bau* bau) {
         if (this->getPosMap() == world->getTreasurePosition()) {
             this->score += bau->getScore();
@@ -182,7 +186,9 @@ Personagem::Personagem(std::string textureDir, sf::Vector2f position, float char
         }
     }
 
+    // Atualização dos sprites de acordo com a movimentação do personagem
     void Personagem::update(World* world, Bau* bau) {
+		
         if (m_estado == Estado::Animando) {
             m_frameCounter++;
             if (m_frameCounter == gameSpeed) {
@@ -212,6 +218,8 @@ Personagem::Personagem(std::string textureDir, sf::Vector2f position, float char
         target->draw(*m_sprite);
         target->draw(*m_nomeSprite);
     }
+
+    // Retorna atributos do objeto
 
     sf::FloatRect Personagem::getGlobalBounds() {
         return m_sprite->getGlobalBounds();

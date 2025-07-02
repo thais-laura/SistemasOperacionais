@@ -2,10 +2,12 @@
 
 void World::initTextures() {
     sf::Texture tempTexture;
+	// Carregando a textura do cenario
     if (tempTexture.loadFromFile("..\\assets\\cenario.png")) this->cenarioTexture = tempTexture;
 }
 
-void World::initSprite() {
+void World::initSprite() { 
+	// Sprite do cenario
     this->cenarioSprite = new sf::Sprite(this->cenarioTexture);
     this->cenarioSprite->setScale({ 3.f,3.f });
 }
@@ -21,9 +23,7 @@ void World::clearMap() {
     // Marcando as paredes como ocupado
     for (int x = 0; x < WORLD_WIDTH; x++) {
         occupied[x][0] = true;
-        //occupied[x][1] = true;
         occupied[x][WORLD_HEIGHT - 1] = true;
-        //occupied[x][WORLD_HEIGHT - 2] = true;
     }
     for (int y = 0; y < WORLD_HEIGHT; y++) {
         occupied[0][y] = true;
@@ -41,9 +41,7 @@ World::World() {
     clearMap();
 }
 
-World::~World() {
-
-}
+World::~World() {}
 
 void World::render(sf::RenderTarget* target) {
     target->draw(*this->cenarioSprite);
@@ -86,7 +84,7 @@ int World::catchTreasure(int x, int y) {
     return 0;
 }
 
-// Retorna um ponto (x, y) aleat�rio que n�o est� ocupado no mapa
+// Retorna um ponto (x, y) aleat�rio que nao esta ocupado no mapa
 sf::Vector2i  World::randomPoint() {
     int x = 0;
     int y = 0;

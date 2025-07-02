@@ -1,9 +1,8 @@
 #include "Game.h"
 
-//Static Functions
+// Funções estáticas
 
-//Initializer Functions
-
+// Funções de inicialização 
 void Game::initPersonagens() {
     
     std::string dirPersonagem1Texture = "../assets/personagem1.png";
@@ -38,7 +37,7 @@ void Game::initWindow() {
 
 
 
-//Constructor
+//Construtor
 //Construir o jogo, inicializando a Tela de renderização, os Estados do jogo e o Jogador
 Game::Game() {
     this->initWindow();
@@ -49,7 +48,7 @@ Game::Game() {
     this->timeStep = 1.0 / 60.0;
 }
 
-//Destructor
+//Destrutor
 Game::~Game() {
     delete this->window;
 
@@ -62,14 +61,13 @@ Game::~Game() {
 
 }
 
-//Functions
+//Funções
 //Quando o Jogador sair do jogo, pelo botão Quit Game ou apertando Close do windows, Salvar os dados
 void Game::endApplication() {
     this->window->close();
 }
 
 //Atualizar variavel dt com tempo entre cada frame. Usado para calculos de produção dos Animais
-
 void Game::incrementAccumulator() {
     this->dt = this->dtClock.restart().asSeconds();
     this->accumulator += this->dt;
