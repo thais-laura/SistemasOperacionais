@@ -163,16 +163,16 @@ Personagem::Personagem(std::string textureDir, sf::Vector2f position, float char
     void Personagem::handleKeyPress(sf::Event::KeyPressed keyPressed, World* world) {
         if (m_estado == Estado::Animando) return;
 
-        if (keyPressed.scancode == sf::Keyboard::Scancode::Left && !world->isOccupied(map_x - 1, map_y)) {
+        if ((keyPressed.scancode == sf::Keyboard::Scancode::Left || keyPressed.scancode == sf::Keyboard::Scancode::A) && !world->isOccupied(map_x - 1, map_y)) {
             mapMove(world, 0);
         }
-        else if (keyPressed.scancode == sf::Keyboard::Scancode::Right && !world->isOccupied(map_x + 1, map_y)) {
+        else if ((keyPressed.scancode == sf::Keyboard::Scancode::Right || keyPressed.scancode == sf::Keyboard::Scancode::D) && !world->isOccupied(map_x + 1, map_y)) {
             mapMove(world, 1);
         }
-        else if (keyPressed.scancode == sf::Keyboard::Scancode::Up && !world->isOccupied(map_x, map_y - 1)) {
+        else if ((keyPressed.scancode == sf::Keyboard::Scancode::Up || keyPressed.scancode == sf::Keyboard::Scancode::W) && !world->isOccupied(map_x, map_y - 1)) {
             mapMove(world, 2);
         }
-        else if (keyPressed.scancode == sf::Keyboard::Scancode::Down && !world->isOccupied(map_x, map_y + 1)) {
+        else if ((keyPressed.scancode == sf::Keyboard::Scancode::Down || keyPressed.scancode == sf::Keyboard::Scancode::S) && !world->isOccupied(map_x, map_y + 1)) {
             mapMove(world, 3);
         }
     }
